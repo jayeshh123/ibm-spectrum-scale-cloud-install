@@ -264,9 +264,37 @@ def prepare_ansible_playbook_encryption_cluster(hosts_config):
     return content.format(hosts_config=hosts_config)
 
 
+def prepare_ansible_playbook_ldap_server():
+    # Write to playbook
+    content = """---
+# Encryption setup for the ldap server
+- hosts: all
+  collections:
+     - ibm.spectrum_scale
+  any_errors_fatal: true
+  roles:
+     - auth_prepare
+"""
+    return content.format()
+
+
+def prepare_ansible_playbook_ldap_cluster(hosts_config):
+    # Write to playbook
+    content = """---
+# Enabling ldap on Storage Scale Clusters
+- hosts: {hosts_config}
+  collections:
+     - ibm.spectrum_scale
+  any_errors_fatal: true
+  roles:
+     - auth_configure
+"""
+    return content.format(hosts_config=hosts_config)
+
+
 def initialize_cluster_details(scale_version, cluster_name, cluster_type, username, password, scale_profile_path, scale_replica_config, enable_mrot,
                                config_ces, storage_subnet_cidr, compute_subnet_cidr, protocol_gateway_ip, scale_remote_cluster_clustername,
-                               scale_encryption_servers, scale_encryption_admin_password):
+                               scale_encryption_servers, scale_encryption_admin_password, ldap_basedns):
     """ Initialize cluster details.
     :args: scale_version (string), cluster_name (string),
            username (string), password (string), scale_profile_path (string),
@@ -302,6 +330,7 @@ def initialize_cluster_details(scale_version, cluster_name, cluster_type, userna
     else:
         cluster_details['scale_encryption_servers'] = []
     cluster_details['scale_encryption_admin_password'] = scale_encryption_admin_password
+    cluster_details['ldap_basedns'] = ldap_basedns
     return cluster_details
 
 
@@ -722,6 +751,8 @@ if __name__ == "__main__":
                         default=[])
     PARSER.add_argument('--scale_encryption_admin_password', help='Admin Password for the Key server',
                         default="null")
+    PARSER.add_argument('--ldap_basedns', help='Base domain of ldap',
+                        default="null")
     ARGUMENTS = PARSER.parse_args()
 
     cluster_type, gui_username, gui_password = None, None, None
@@ -908,6 +939,19 @@ if __name__ == "__main__":
         print("Content of ansible playbook for encryption:\n",
               encryption_playbook_content)
 
+    # Step-4.2: Create LDAP playbook
+    if ARGUMENTS.ldap_basedns != "null":
+        ldap_playbook_content = prepare_ansible_playbook_ldap_server()
+        write_to_file("%s/%s/ldap_configure_playbook.yaml" % (ARGUMENTS.install_infra_path,
+                                                              "ibm-spectrum-scale-install-infra"), ldap_playbook_content)
+        ldap_playbook_content = prepare_ansible_playbook_ldap_cluster(
+            "scale_nodes")
+        write_to_file("%s/%s/ldap_cluster_playbook.yaml" % (ARGUMENTS.install_infra_path,
+                                                            "ibm-spectrum-scale-install-infra"), ldap_playbook_content)
+    if ARGUMENTS.verbose:
+        print("Content of ansible playbook for ldap:\n",
+              ldap_playbook_content)
+
     # Step-5: Create hosts
     config = configparser.ConfigParser(allow_no_value=True)
     node_details = initialize_node_details(len(TF['vpc_availability_zones']), cluster_type,
@@ -947,7 +991,8 @@ if __name__ == "__main__":
                                                     TF['protocol_gateway_ip'],
                                                     TF['scale_remote_cluster_clustername'],
                                                     ARGUMENTS.scale_encryption_servers,
-                                                    ARGUMENTS.scale_encryption_admin_password)
+                                                    ARGUMENTS.scale_encryption_admin_password,
+                                                    ARGUMENTS.ldap_basedns)
     with open("%s/%s/%s_inventory.ini" % (ARGUMENTS.install_infra_path,
                                           "ibm-spectrum-scale-install-infra",
                                           cluster_type), 'w') as configfile:
