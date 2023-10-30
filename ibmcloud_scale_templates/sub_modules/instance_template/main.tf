@@ -250,7 +250,7 @@ module "ldap_instance" {
   vsi_profile          = var.ldap_vsi_profile
   vsi_subnet_id        = var.vpc_storage_cluster_private_subnets[0]
   vsi_security_group   = [module.ldap_instance_security_group.sec_group_id]
-  vsi_user_public_key  = var.ldap_basedns != null ? [data.ibm_is_ssh_key.ldap_ssh_key[0].id] : []
+  vsi_user_public_key  = var.ldap_basedns != null ? data.ibm_is_ssh_key.ldap_ssh_key[*].id : []
   vsi_meta_private_key = var.ldap_basedns != null ? module.generate_ldap_instance_keys.private_key_content : 0
   vsi_meta_public_key  = var.ldap_basedns != null ? module.generate_ldap_instance_keys.public_key_content : 0
   depends_on           = [module.generate_ldap_instance_keys, module.ldap_instance_security_group]
