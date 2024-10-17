@@ -233,6 +233,9 @@ def prepare_ansible_playbook(hosts_config, cluster_config, cluster_key_file):
      - {{ role: afm_cos_prepare, when: enable_afm }}
      - {{ role: afm_cos_install, when: "enable_afm and scale_packages_installed is false" }}
      - {{ role: afm_cos_configure, when: enable_afm }}
+     - {{ role: kp_encryption_prepare, when: enable_key_protect }}
+     - {{ role: kp_encryption_configure, when: enable_key_protect }}
+     - {{ role: kp_encryption_apply, when: enable_key_protect }}
 """.format(hosts_config=hosts_config, cluster_config=cluster_config,
            cluster_key_file=cluster_key_file)
     return content
@@ -320,6 +323,8 @@ def prepare_ansible_playbook_encryption_cluster(hosts_config):
      - encryption_configure
 """
     return content.format(hosts_config=hosts_config)
+##########################################################################################################
+##########################################################################################################
 
 def prepare_ansible_playbook_encryption_keyprotect(hosts_config):
     # Write to playbook
@@ -358,9 +363,10 @@ def prepare_ansible_playbook_encryption_keyprotect_apply(hosts_config):
 """
     return content.format(hosts_config=hosts_config)
 
-
+##########################################################################################################
+##########################################################################################################
 def initialize_cluster_details(scale_version, cluster_name, cluster_type, username, password, scale_profile_path, scale_replica_config, enable_mrot,
-                               enable_ces, enable_afm, storage_subnet_cidr, compute_subnet_cidr, protocol_gateway_ip, scale_remote_cluster_clustername,
+                               enable_ces, enable_afm, enable_key_protect, storage_subnet_cidr, compute_subnet_cidr, protocol_gateway_ip, scale_remote_cluster_clustername,
                                scale_encryption_servers, scale_encryption_admin_password, scale_encryption_type, kp_resource_prefix, vpc_region, enable_ldap, ldap_basedns, ldap_server, ldap_admin_password, afm_cos_bucket_details, afm_config_details):
     """ Initialize cluster details.
     :args: scale_version (string), cluster_name (string),
@@ -384,6 +390,7 @@ def initialize_cluster_details(scale_version, cluster_name, cluster_type, userna
     cluster_details['enable_mrot'] = enable_mrot
     cluster_details['enable_ces'] = enable_ces
     cluster_details['enable_afm'] = enable_afm
+    cluster_details['enable_key_protect'] = enable_key_protect
     cluster_details['storage_subnet_cidr'] = storage_subnet_cidr
     cluster_details['compute_subnet_cidr'] = compute_subnet_cidr
     cluster_details['protocol_gateway_ip'] = protocol_gateway_ip
@@ -833,6 +840,8 @@ if __name__ == "__main__":
                         default=8)
     PARSER.add_argument("--afm_bandwidth", help="AFM node bandwidth",
                         default=16000)
+    PARSER.add_argument('--enable_key_protect', help='enable key protect',
+                        default="null")
     ARGUMENTS = PARSER.parse_args()
 
     cluster_type, gui_username, gui_password = None, None, None
@@ -1154,6 +1163,7 @@ if __name__ == "__main__":
                                                     ARGUMENTS.enable_mrot_conf,
                                                     ARGUMENTS.enable_ces,
                                                     ARGUMENTS.enable_afm,
+                                                    ARGUMENTS.enable_key_protect,
                                                     TF['storage_subnet_cidr'],
                                                     TF['compute_subnet_cidr'],
                                                     TF['protocol_gateway_ip'],
