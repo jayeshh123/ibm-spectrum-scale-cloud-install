@@ -47,6 +47,8 @@ variable "filesets" {}
 variable "afm_cos_bucket_details" {}
 variable "afm_config_details" {}
 variable "afm_cluster_instance_names" {}
+variable "kp_resource_prefixs" {}
+variable "filesystem_mountpoints" {}
 
 resource "local_sensitive_file" "itself" {
   count    = (tobool(var.clone_complete) == true && var.write_inventory == 1) ? 1 : 0
@@ -93,8 +95,9 @@ resource "local_sensitive_file" "itself" {
     "filesets": ${var.filesets},
     "afm_cos_bucket_details": ${var.afm_cos_bucket_details},
     "afm_config_details": ${var.afm_config_details},
-    "afm_cluster_instance_names": ${var.afm_cluster_instance_names}
-
+    "afm_cluster_instance_names": ${var.afm_cluster_instance_names},
+    "kp_resource_prefixs": ${var.kp_resource_prefixs},
+    "filesystem_mountpoints": ${var.filesystem_mountpoints}
 }
 EOT
   filename = var.inventory_path

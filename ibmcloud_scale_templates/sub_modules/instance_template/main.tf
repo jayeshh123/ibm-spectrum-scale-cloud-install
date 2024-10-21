@@ -826,6 +826,8 @@ module "write_compute_cluster_inventory" {
   afm_cos_bucket_details                           = jsonencode([])
   afm_config_details                               = jsonencode([])
   afm_cluster_instance_names                       = jsonencode([])
+  kp_resource_prefixs                              = jsonencode("")
+  filesystem_mountpoints                           = jsonencode("")
 }
 
 module "write_storage_cluster_inventory" {
@@ -875,6 +877,8 @@ module "write_storage_cluster_inventory" {
   afm_cos_bucket_details                           = local.enable_afm == true ? jsonencode(local.afm_cos_bucket_details) : jsonencode([])
   afm_config_details                               = local.enable_afm == true ? jsonencode(local.afm_config_details) : jsonencode([])
   afm_cluster_instance_names                       = jsonencode(local.afm_instance_names)
+  kp_resource_prefixs                              = jsonencode(var.resource_prefix)
+  filesystem_mountpoints                           = jsonencode(element(split("/", var.storage_cluster_filesystem_mountpoint), length(split("/", var.storage_cluster_filesystem_mountpoint)) - 1))
 }
 
 module "write_cluster_inventory" {
@@ -924,6 +928,8 @@ module "write_cluster_inventory" {
   afm_cos_bucket_details                           = jsonencode([])
   afm_config_details                               = jsonencode([])
   afm_cluster_instance_names                       = jsonencode([])
+  kp_resource_prefixs                              = jsonencode("")
+  filesystem_mountpoints                           = jsonencode("")
 }
 
 module "write_client_cluster_inventory" {
@@ -973,6 +979,8 @@ module "write_client_cluster_inventory" {
   afm_cos_bucket_details                           = jsonencode([])
   afm_config_details                               = jsonencode([])
   afm_cluster_instance_names                       = jsonencode([])
+  kp_resource_prefixs                              = jsonencode("")
+  filesystem_mountpoints                           = jsonencode("")
 }
 
 module "compute_cluster_configuration" {
@@ -1017,7 +1025,7 @@ module "storage_cluster_configuration" {
   clone_complete                      = module.prepare_ansible_configuration.clone_complete
   bastion_user                        = jsonencode(var.bastion_user)
   write_inventory_complete            = module.write_storage_cluster_inventory.write_inventory_complete
-  kp_resource_prefix                  = var.resource_prefix
+  kp_resource_prefix                  = jsonencode(var.resource_prefix)
   vpc_region                          = var.vpc_region
   inventory_format                    = var.inventory_format
   create_scale_cluster                = var.create_scale_cluster
@@ -1070,6 +1078,7 @@ module "storage_cluster_configuration" {
   ldap_server                         = local.ldap_server
   ldap_admin_password                 = var.ldap_admin_password
   enable_key_protect                  = var.scale_encryption_type == "key_protect" ? "True" : "False"
+  #filesystem_mountpoint                   = element(split("/", var.storage_cluster_filesystem_mountpoint), length(split("/", var.storage_cluster_filesystem_mountpoint)) - 1)
   depends_on                          = [module.ldap_configuration]
 }
 
