@@ -327,7 +327,7 @@ def prepare_ansible_playbook_encryption_cluster(hosts_config):
 
 def initialize_cluster_details(scale_version, cluster_name, cluster_type, username, password, scale_profile_path, scale_replica_config, enable_mrot,
                                enable_ces, enable_afm, enable_key_protect, storage_subnet_cidr, compute_subnet_cidr, protocol_gateway_ip, scale_remote_cluster_clustername,
-                               scale_encryption_servers, scale_encryption_admin_password, scale_encryption_type, kp_resource_prefixs, filesystem_mountpoints, vpc_region, enable_ldap, ldap_basedns, ldap_server, ldap_admin_password, afm_cos_bucket_details, afm_config_details):
+                               scale_encryption_servers, scale_encryption_admin_password, scale_encryption_type, scale_cluster_clustername, filesystem_mountpoints, vpc_region, enable_ldap, ldap_basedns, ldap_server, ldap_admin_password, afm_cos_bucket_details, afm_config_details):
     """ Initialize cluster details.
     :args: scale_version (string), cluster_name (string),
            username (string), password (string), scale_profile_path (string),
@@ -366,7 +366,8 @@ def initialize_cluster_details(scale_version, cluster_name, cluster_type, userna
         cluster_details['scale_encryption_servers'] = []
     cluster_details['scale_encryption_admin_password'] = scale_encryption_admin_password
     cluster_details['scale_encryption_type'] = scale_encryption_type
-    cluster_details['kp_resource_prefixs'] = kp_resource_prefixs
+    resource_prfix = scale_cluster_clustername.split('.')[0]
+    cluster_details['kp_resource_prefixs'] = resource_prfix
     cluster_details['filesystem_mountpoints'] = filesystem_mountpoints
     cluster_details['vpc_region'] = vpc_region
     cluster_details['enable_ldap'] = enable_ldap
@@ -1114,7 +1115,7 @@ if __name__ == "__main__":
                                                     ARGUMENTS.scale_encryption_servers,
                                                     ARGUMENTS.scale_encryption_admin_password,
                                                     ARGUMENTS.scale_encryption_type,
-                                                    TF['kp_resource_prefixs'],
+                                                    TF['scale_cluster_clustername'],
                                                     TF['filesystem_mountpoints'],
                                                     TF['vpc_region'],
                                                     ARGUMENTS.enable_ldap,

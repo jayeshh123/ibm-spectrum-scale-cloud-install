@@ -40,7 +40,6 @@ variable "spectrumscale_rpms_path" {}
 variable "enable_mrot_conf" {}
 variable "scale_encryption_enabled" {}
 variable "scale_encryption_type" {}
-variable "kp_resource_prefix" {}
 variable "vpc_region" {}
 variable "scale_encryption_admin_password" {}
 variable "scale_encryption_servers" {}
