@@ -326,42 +326,42 @@ def prepare_ansible_playbook_encryption_cluster(hosts_config):
 ##########################################################################################################
 ##########################################################################################################
 
-def prepare_ansible_playbook_encryption_keyprotect(hosts_config):
-    # Write to playbook
-    content = """---
-- hosts: "{{{{ groups['{hosts_config}'] | select('search', 'mgmt-001') | list | first }}}}"
-  collections:
-    - ibm.spectrum_scale
-  any_errors_fatal: true
-  roles:
-     - kp_encryption_prepare
-"""
-    return content.format(hosts_config=hosts_config)
+# def prepare_ansible_playbook_encryption_keyprotect(hosts_config):
+#     # Write to playbook
+#     content = """---
+# - hosts: "{{{{ groups['{hosts_config}'] | select('search', 'mgmt-001') | list | first }}}}"
+#   collections:
+#     - ibm.spectrum_scale
+#   any_errors_fatal: true
+#   roles:
+#      - kp_encryption_prepare
+# """
+#     return content.format(hosts_config=hosts_config)
 
-def prepare_ansible_playbook_encryption_keyprotect_configure(hosts_config):
-    # Write to playbook
-    content = """---
-- hosts: {hosts_config}
-  collections:
-     - ibm.spectrum_scale
-  any_errors_fatal: true
-  roles:
-     - kp_encryption_configure
-"""
-    return content.format(hosts_config=hosts_config)
+# def prepare_ansible_playbook_encryption_keyprotect_configure(hosts_config):
+#     # Write to playbook
+#     content = """---
+# - hosts: {hosts_config}
+#   collections:
+#      - ibm.spectrum_scale
+#   any_errors_fatal: true
+#   roles:
+#      - kp_encryption_configure
+# """
+#     return content.format(hosts_config=hosts_config)
 
-def prepare_ansible_playbook_encryption_keyprotect_apply(hosts_config):
-    # Write to playbook
-    content = """---
-# Enabling encryption on Storage Scale
-- hosts: "{{{{ groups['{hosts_config}'] | select('search', 'mgmt-001') | list | first }}}}"
-  collections:
-     - ibm.spectrum_scale
-  any_errors_fatal: true
-  roles:
-     - kp_encryption_apply
-"""
-    return content.format(hosts_config=hosts_config)
+# def prepare_ansible_playbook_encryption_keyprotect_apply(hosts_config):
+#     # Write to playbook
+#     content = """---
+# # Enabling encryption on Storage Scale
+# - hosts: "{{{{ groups['{hosts_config}'] | select('search', 'mgmt-001') | list | first }}}}"
+#   collections:
+#      - ibm.spectrum_scale
+#   any_errors_fatal: true
+#   roles:
+#      - kp_encryption_apply
+# """
+#     return content.format(hosts_config=hosts_config)
 
 ##########################################################################################################
 ##########################################################################################################
