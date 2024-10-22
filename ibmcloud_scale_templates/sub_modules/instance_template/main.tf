@@ -1012,6 +1012,7 @@ module "compute_cluster_configuration" {
   ldap_basedns                    = var.ldap_basedns
   ldap_server                     = local.ldap_server
   ldap_admin_password             = var.ldap_admin_password
+  enable_key_protect              = var.scale_encryption_type == "key_protect" ? "True" : "False"
   depends_on                      = [module.ldap_configuration]
 }
 
