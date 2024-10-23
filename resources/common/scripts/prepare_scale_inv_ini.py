@@ -367,8 +367,8 @@ def initialize_cluster_details(scale_version, cluster_name, cluster_type, userna
     cluster_details['scale_encryption_admin_password'] = scale_encryption_admin_password
     cluster_details['scale_encryption_type'] = scale_encryption_type
     resource_prefix = resource_prefix.split('.')[0]
-    cluster_details['kp_resource_prefixs'] = resource_prefix
-    cluster_details['filesystem_mountpoints'] = filesystem_mountpoints
+    cluster_details['kp_resource_prefix'] = resource_prefix
+    cluster_details['filesystem_mountpoint'] = filesystem_mountpoints
     cluster_details['vpc_region'] = vpc_region
     cluster_details['enable_ldap'] = enable_ldap
     cluster_details['ldap_basedns'] = ldap_basedns
