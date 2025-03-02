@@ -278,7 +278,7 @@ module "gklm_instance_ingress_security_rule" {
   total_rules              = (var.scale_encryption_enabled == true && var.scale_encryption_type == "gklm" && var.using_jumphost_connection == false && var.gklm_sg_name == null) ? 5 : 0
   security_group_id        = [module.gklm_instance_security_group.sec_group_id]
   sg_direction             = ["inbound"]
-  source_security_group_id = [var.bastion_security_group_id, local.deploy_sec_group_id, module.gklm_instance_security_group.sec_group_id, module.compute_cluster_security_group.sec_group_id, module.storage_cluster_security_group.sec_group_id]
+  source_security_group_id = [var.bastion_security_group_id, local.deploy_sec_group_id, module.gklm_instance_security_group.sec_group_id, local.existing_comp_sg_id[0], local.existing_strg_sg_id[0]]
 }
 
 module "gklm_instance_ingress_security_rule_wt_bastion" {
@@ -286,7 +286,7 @@ module "gklm_instance_ingress_security_rule_wt_bastion" {
   total_rules              = (var.scale_encryption_enabled == true && var.scale_encryption_type == "gklm" && var.using_jumphost_connection == true && var.deploy_controller_sec_group_id != null && var.gklm_sg_name == null) ? 5 : 0
   security_group_id        = [module.gklm_instance_security_group.sec_group_id]
   sg_direction             = ["inbound"]
-  source_security_group_id = [var.bastion_security_group_id, local.deploy_sec_group_id, module.gklm_instance_security_group.sec_group_id, module.compute_cluster_security_group.sec_group_id, module.storage_cluster_security_group.sec_group_id]
+  source_security_group_id = [var.bastion_security_group_id, local.deploy_sec_group_id, module.gklm_instance_security_group.sec_group_id, local.existing_comp_sg_id[0], local.existing_strg_sg_id[0]]
 }
 
 module "gklm_instance_ingress_security_rule_wo_bastion" {
@@ -294,7 +294,7 @@ module "gklm_instance_ingress_security_rule_wo_bastion" {
   total_rules              = (var.scale_encryption_enabled == true && var.scale_encryption_type == "gklm" && var.using_jumphost_connection == true && var.deploy_controller_sec_group_id == null && var.gklm_sg_name == null) ? 4 : 0
   security_group_id        = [module.gklm_instance_security_group.sec_group_id]
   sg_direction             = ["inbound"]
-  source_security_group_id = [local.deploy_sec_group_id, module.gklm_instance_security_group.sec_group_id, module.compute_cluster_security_group.sec_group_id, module.storage_cluster_security_group.sec_group_id]
+  source_security_group_id = [local.deploy_sec_group_id, module.gklm_instance_security_group.sec_group_id, local.existing_comp_sg_id[0], local.existing_strg_sg_id[0]]
 }
 
 module "ldap_instance_security_group" {
@@ -311,7 +311,7 @@ module "ldap_instance_ingress_security_rule" {
   total_rules              = (var.enable_ldap == true && var.ldap_server == "null" && var.using_jumphost_connection == false && var.ldap_sg_name == null) ? 5 : 0
   security_group_id        = [module.ldap_instance_security_group.sec_group_id]
   sg_direction             = ["inbound"]
-  source_security_group_id = [var.bastion_security_group_id, local.deploy_sec_group_id, module.ldap_instance_security_group.sec_group_id, module.compute_cluster_security_group.sec_group_id, module.storage_cluster_security_group.sec_group_id]
+  source_security_group_id = [var.bastion_security_group_id, local.deploy_sec_group_id, module.ldap_instance_security_group.sec_group_id, local.existing_comp_sg_id[0], local.existing_strg_sg_id[0]]
 }
 
 module "ldap_instance_ingress_security_rule_wt_bastion" {
@@ -319,7 +319,7 @@ module "ldap_instance_ingress_security_rule_wt_bastion" {
   total_rules              = (var.enable_ldap == true && var.ldap_server == "null" && var.using_jumphost_connection == true && var.deploy_controller_sec_group_id != null && var.ldap_sg_name == null) ? 5 : 0
   security_group_id        = [module.ldap_instance_security_group.sec_group_id]
   sg_direction             = ["inbound"]
-  source_security_group_id = [var.bastion_security_group_id, local.deploy_sec_group_id, module.ldap_instance_security_group.sec_group_id, module.compute_cluster_security_group.sec_group_id, module.storage_cluster_security_group.sec_group_id]
+  source_security_group_id = [var.bastion_security_group_id, local.deploy_sec_group_id, module.ldap_instance_security_group.sec_group_id, local.existing_comp_sg_id[0], local.existing_strg_sg_id[0]]
 }
 
 module "ldap_instance_ingress_security_rule_wo_bastion" {
@@ -327,7 +327,7 @@ module "ldap_instance_ingress_security_rule_wo_bastion" {
   total_rules              = (var.enable_ldap == true && var.ldap_server == "null" && var.using_jumphost_connection == true && var.deploy_controller_sec_group_id == null && var.ldap_sg_name == null) ? 4 : 0
   security_group_id        = [module.ldap_instance_security_group.sec_group_id]
   sg_direction             = ["inbound"]
-  source_security_group_id = [local.deploy_sec_group_id, module.ldap_instance_security_group.sec_group_id, module.compute_cluster_security_group.sec_group_id, module.storage_cluster_security_group.sec_group_id]
+  source_security_group_id = [local.deploy_sec_group_id, module.ldap_instance_security_group.sec_group_id, local.existing_comp_sg_id[0], local.existing_strg_sg_id[0]]
 }
 
 data "ibm_is_ssh_key" "ldap_ssh_key" {
