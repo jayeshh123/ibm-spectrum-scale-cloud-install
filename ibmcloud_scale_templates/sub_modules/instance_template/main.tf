@@ -108,13 +108,13 @@ locals {
   # tflint-ignore: terraform_unused_declarations
   validate_strg_sg_in_strg_sg_chk = var.strg_sg_name != null ? regex("^${local.strg_sg_in_strg_sg_msg}$", (local.validate_strg_sg_in_strg_sg ? local.strg_sg_in_strg_sg_msg : "")) : true
 
-  validate_comp_sg_in_strg_sg = var.enable_sg_validation == true && var.total_compute_cluster_instances > 0 && var.comp_sg_name != null ? contains(local.strg_sg_rules, tolist(data.ibm_is_security_group.comp_security_group[*].id)[0]) : true
+  validate_comp_sg_in_strg_sg = var.enable_sg_validation == true && var.total_compute_cluster_instances > 0 && var.comp_sg_name != null && var.strg_sg_name != null ? contains(local.strg_sg_rules, tolist(data.ibm_is_security_group.comp_security_group[*].id)[0]) : true
   comp_sg_in_strg_sg_msg      = "The storage security group does not include the compute security group as a rule."
   # tflint-ignore: terraform_unused_declarations
   validate_comp_sg_in_strg_sg_chk = var.comp_sg_name != null ? regex("^${local.comp_sg_in_strg_sg_msg}$", (local.validate_comp_sg_in_strg_sg ? local.comp_sg_in_strg_sg_msg : "")) : true
 
   # Compute Security group validation
-  validate_strg_sg_in_comp_sg = var.enable_sg_validation == true && var.total_compute_cluster_instances > 0 && var.strg_sg_name != null ? contains(local.comp_sg_rules, tolist(data.ibm_is_security_group.strg_security_group[*].id)[0]) : true
+  validate_strg_sg_in_comp_sg = var.enable_sg_validation == true && var.total_compute_cluster_instances > 0 && var.strg_sg_name != null && var.comp_sg_name != null ? contains(local.comp_sg_rules, tolist(data.ibm_is_security_group.strg_security_group[*].id)[0]) : true
   strg_sg_in_comp_sg_msg      = "The compute security group does not include the storage security group as a rule."
   # tflint-ignore: terraform_unused_declarations
   validate_strg_sg_in_comp_sg_chk = var.strg_sg_name != null ? regex("^${local.strg_sg_in_comp_sg_msg}$", (local.validate_strg_sg_in_comp_sg ? local.strg_sg_in_comp_sg_msg : "")) : true
@@ -256,12 +256,17 @@ module "storage_cluster_ingress_security_rule_wo_bastion" {
   source_security_group_id = [local.deploy_sec_group_id, module.storage_cluster_security_group.sec_group_id]
 }
 
+locals {
+  strg_comp_sg_id    = (var.strg_sg_name == null && var.comp_sg_name == null) ? [module.storage_cluster_security_group.sec_group_id, module.compute_cluster_security_group.sec_group_id] : (var.strg_sg_name != null && var.comp_sg_name == null) ? [flatten([data.ibm_is_security_group.strg_security_group[*].id])[0], module.compute_cluster_security_group.sec_group_id] : (var.strg_sg_name == null && var.comp_sg_name != null) ? [module.storage_cluster_security_group.sec_group_id, flatten([data.ibm_is_security_group.comp_security_group[*].id])[0]] : []
+  strg_comp_sg_rules = (var.strg_sg_name == null && var.comp_sg_name == null) ? [module.compute_cluster_security_group.sec_group_id, module.storage_cluster_security_group.sec_group_id] : (var.strg_sg_name != null && var.comp_sg_name == null) ? [module.compute_cluster_security_group.sec_group_id, flatten([data.ibm_is_security_group.strg_security_group[*].id])[0]] : (var.strg_sg_name == null && var.comp_sg_name != null) ? [flatten([data.ibm_is_security_group.comp_security_group[*].id])[0], module.storage_cluster_security_group.sec_group_id] : []
+}
+
 module "bicluster_ingress_security_rule" {
   source                   = "../../../resources/ibmcloud/security/security_rule_source"
-  total_rules              = (var.total_storage_cluster_instances > 0 && (var.total_client_cluster_instances > 0 || var.total_compute_cluster_instances > 0) && var.strg_sg_name == null) ? 2 : 0
-  security_group_id        = [module.storage_cluster_security_group.sec_group_id, module.compute_cluster_security_group.sec_group_id]
+  total_rules              = (var.total_storage_cluster_instances > 0 && (var.total_client_cluster_instances > 0 || var.total_compute_cluster_instances > 0)) ? 2 : 0
+  security_group_id        = local.strg_comp_sg_id
   sg_direction             = ["inbound", "inbound"]
-  source_security_group_id = [module.compute_cluster_security_group.sec_group_id, module.storage_cluster_security_group.sec_group_id]
+  source_security_group_id = local.strg_comp_sg_rules
 }
 
 module "gklm_instance_security_group" {
