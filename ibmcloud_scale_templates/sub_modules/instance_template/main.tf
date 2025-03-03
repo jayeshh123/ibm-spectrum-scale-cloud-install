@@ -263,7 +263,7 @@ locals {
 
 module "bicluster_ingress_security_rule" {
   source                   = "../../../resources/ibmcloud/security/security_rule_source"
-  total_rules              = (var.total_storage_cluster_instances > 0 && (var.total_client_cluster_instances > 0 || var.total_compute_cluster_instances > 0)) ? 2 : 0
+  total_rules              = (var.total_storage_cluster_instances > 0 && (var.total_client_cluster_instances > 0 || var.total_compute_cluster_instances > 0) && ((var.strg_sg_name == null && var.comp_sg_name == null) || (var.strg_sg_name != null && var.comp_sg_name == null) || (var.strg_sg_name == null && var.comp_sg_name != null))) ? 2 : 0
   security_group_id        = local.strg_comp_sg_id
   sg_direction             = ["inbound", "inbound"]
   source_security_group_id = local.strg_comp_sg_rules
