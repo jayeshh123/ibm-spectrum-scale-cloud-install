@@ -74,9 +74,14 @@ def calculate_maxFilesToCache(nodeclass, memory):
     return maxFilesToCache
 
 
+# def calculate_maxReceiverThreads(vcpus):
+#     """ Calculate maxReceiverThreads """
+#     maxReceiverThreads = int(vcpus)
+#     return maxReceiverThreads
+
 def calculate_maxReceiverThreads(vcpus):
-    """ Calculate maxReceiverThreads """
-    maxReceiverThreads = int(vcpus)
+    """Calculate maxReceiverThreads with a maximum limit of 128"""
+    maxReceiverThreads = min(int(vcpus), 128)
     return maxReceiverThreads
 
 
