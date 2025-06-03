@@ -74,11 +74,6 @@ def calculate_maxFilesToCache(nodeclass, memory):
     return maxFilesToCache
 
 
-# def calculate_maxReceiverThreads(vcpus):
-#     """ Calculate maxReceiverThreads """
-#     maxReceiverThreads = int(vcpus)
-#     return maxReceiverThreads
-
 def calculate_maxReceiverThreads(vcpus):
     """Calculate maxReceiverThreads with a maximum limit of 128"""
     maxReceiverThreads = min(int(vcpus), 128)
@@ -584,7 +579,7 @@ def get_disks_list(az_count, disk_mapping, desc_disk_mapping, disk_type):
             for each_disk in disk_per_ip:
                 disks_list.append({"device": each_disk,
                                    "failureGroup": failureGroup, "servers": each_ip,
-                                   "usage": "dataAndMetadata", "pool": "system"})
+                                   "usage": "dataAndMetadata", "pool": "system", "thinDiskType": "auto"})
 
     # Map storage nodes to failure groups based on AZ and subnet variations
     else:
@@ -622,19 +617,19 @@ def get_disks_list(az_count, disk_mapping, desc_disk_mapping, disk_type):
                 for each_disk in disk_per_ip:
                     disks_list.append({"device": each_disk,
                                        "failureGroup": 1, "servers": each_ip,
-                                       "usage": "dataAndMetadata", "pool": "system"})
+                                       "usage": "dataAndMetadata", "pool": "system", "thinDiskType": "auto"})
             if each_ip in failure_group2:
                 for each_disk in disk_per_ip:
                     disks_list.append({"device": each_disk,
                                        "failureGroup": 2, "servers": each_ip,
-                                       "usage": "dataAndMetadata", "pool": "system"})
+                                       "usage": "dataAndMetadata", "pool": "system", "thinDiskType": "auto"})
 
         # Append "descOnly" disk details
         if len(desc_disk_mapping.keys()):
             disks_list.append({"device": list(desc_disk_mapping.values())[0][0],
                                "failureGroup": 3,
                                "servers": list(desc_disk_mapping.keys())[0],
-                               "usage": "descOnly", "pool": "system"})
+                               "usage": "descOnly", "pool": "system", "thinDiskType": "auto"})
     return disks_list
 
 
