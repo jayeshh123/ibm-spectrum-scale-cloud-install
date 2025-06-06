@@ -25,12 +25,6 @@ resource "null_resource" "openssl_commands" {
       mkdir -p "${var.key_protect_path}"
       # Get the Key Protect Server certificate
       openssl s_client -showcerts -connect "${var.vpc_region}.kms.cloud.ibm.com:5696" < /dev/null > "${var.key_protect_path}/Key_Protect_Server.cert"
-      # Extract the end date of the certificate
-      [ -f "${var.key_protect_path}/Key_Protect_Server.cert" ] &&  END_DATE=$(openssl x509 -enddate -noout -in "${var.key_protect_path}/Key_Protect_Server.cert" | awk -F'=' '{print $2}')
-      # Get the current date in GMT
-      CURRENT_DATE=$(date -u +"%b %d %T %Y %Z")
-      # Calculate the difference in days
-      DIFF_DAYS=3650 #$(echo $(( ( $(date -ud "$END_DATE" +%s) - $(date -ud "$CURRENT_DATE" +%s) ) / 86400 )))
       # Create a Key Protect Server Root and CA certs
       [ -f "${var.key_protect_path}/Key_Protect_Server.cert" ] && awk '/-----BEGIN CERTIFICATE-----/,/-----END CERTIFICATE-----/' "${var.key_protect_path}/Key_Protect_Server.cert" > "${var.key_protect_path}/Key_Protect_Server_CA.cert"
       [ -f "${var.key_protect_path}/Key_Protect_Server_CA.cert" ] && awk '/-----BEGIN CERTIFICATE-----/{x="${var.key_protect_path}/Key_Protect_Server.chain"i".cert"; i++} {print > x}' "${var.key_protect_path}/Key_Protect_Server_CA.cert"
@@ -38,7 +32,7 @@ resource "null_resource" "openssl_commands" {
       # Create a Self Signed Certificates
       [ ! -f "${var.key_protect_path}/${var.resource_prefix}.key" ] && openssl genpkey -algorithm RSA -out "${var.key_protect_path}/${var.resource_prefix}.key"
       [ ! -f "${var.key_protect_path}/${var.resource_prefix}.csr" ] && openssl req -new -key "${var.key_protect_path}/${var.resource_prefix}.key" -out "${var.key_protect_path}/${var.resource_prefix}.csr" -subj "/CN=${var.vpc_storage_cluster_dns_domain}"
-      [ ! -f "${var.key_protect_path}/${var.resource_prefix}.cert" ] && openssl x509 -req -days $DIFF_DAYS -in "${var.key_protect_path}/${var.resource_prefix}.csr" -signkey "${var.key_protect_path}/${var.resource_prefix}.key" -out "${var.key_protect_path}/${var.resource_prefix}.cert"
+      [ ! -f "${var.key_protect_path}/${var.resource_prefix}.cert" ] && openssl x509 -req -days 3650 -in "${var.key_protect_path}/${var.resource_prefix}.csr" -signkey "${var.key_protect_path}/${var.resource_prefix}.key" -out "${var.key_protect_path}/${var.resource_prefix}.cert"
     EOT
   }
 }
