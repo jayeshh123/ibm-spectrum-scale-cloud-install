@@ -30,7 +30,7 @@ resource "null_resource" "openssl_commands" {
       # Get the current date in GMT
       CURRENT_DATE=$(date -u +"%b %d %T %Y %Z")
       # Calculate the difference in days
-      DIFF_DAYS=$(echo $(( ( $(date -ud "$END_DATE" +%s) - $(date -ud "$CURRENT_DATE" +%s) ) / 86400 )))
+      DIFF_DAYS=3650 #$(echo $(( ( $(date -ud "$END_DATE" +%s) - $(date -ud "$CURRENT_DATE" +%s) ) / 86400 )))
       # Create a Key Protect Server Root and CA certs
       [ -f "${var.key_protect_path}/Key_Protect_Server.cert" ] && awk '/-----BEGIN CERTIFICATE-----/,/-----END CERTIFICATE-----/' "${var.key_protect_path}/Key_Protect_Server.cert" > "${var.key_protect_path}/Key_Protect_Server_CA.cert"
       [ -f "${var.key_protect_path}/Key_Protect_Server_CA.cert" ] && awk '/-----BEGIN CERTIFICATE-----/{x="${var.key_protect_path}/Key_Protect_Server.chain"i".cert"; i++} {print > x}' "${var.key_protect_path}/Key_Protect_Server_CA.cert"
